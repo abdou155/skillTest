@@ -2,8 +2,21 @@ const { db } = require("../config");
 const { ERROR_MESSAGES } = require("../constants");
 const { ApiError } = require("./api-error");
 
-const processDBRequest = async ({ query, queryParams }) => {
+const preparedStatementsCache = new Set();
+
+const processDBRequest = async ({ query, queryParams, name, text, values }) => {
     try {
+        if (name) {
+            const isNew = !preparedStatementsCache.has(name);
+            if (isNew) {
+                preparedStatementsCache.add(name);
+                console.log(`[PS] Preparing: "${name}"`);
+            } else {
+                console.log(`[PS] Using cached: "${name}"`);
+            }
+            const result = await db.query({ name, text, values });
+            return result;
+        }
         const result = await db.query(query, queryParams);
         return result;
     } catch (error) {
