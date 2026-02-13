@@ -1,0 +1,248 @@
+{
+  "info": {
+    "name": "SkillTest - Students API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5007"
+    },
+    {
+      "key": "csrfToken",
+      "value": ""
+    },
+    {
+      "key": "studentId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth - Login (sets cookies + csrfToken variable)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const csrf = pm.cookies.get('csrfToken');",
+              "if (csrf) {",
+              "  pm.collectionVariables.set('csrfToken', csrf);",
+              "}",
+              "pm.test('Login succeeded', function () {",
+              "  pm.expect(pm.response.code).to.be.oneOf([200]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin@school-admin.com\",\n  \"password\": \"3OU4zn3q6Zh9\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Students - List",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-csrf-token",
+            "value": "{{csrfToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Students - Get Detail",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-csrf-token",
+            "value": "{{csrfToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students/{{studentId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "{{studentId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Students - Create",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Create succeeded', function () {",
+              "  pm.expect(pm.response.code).to.be.oneOf([200]);",
+              "});",
+              "// If API returns new id in future, you can set pm.collectionVariables.set('studentId', ...);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-csrf-token",
+            "value": "{{csrfToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test Student\",\n  \"email\": \"test.student+1@example.com\",\n  \"gender\": \"male\",\n  \"phone\": \"0600000000\",\n  \"dob\": \"2010-01-01\",\n  \"class\": \"Class 1\",\n  \"section\": \"A\",\n  \"roll\": 10,\n  \"admissionDate\": \"2024-09-01\",\n  \"currentAddress\": \"Current address\",\n  \"permanentAddress\": \"Permanent address\",\n  \"fatherName\": \"Father\",\n  \"fatherPhone\": \"0600000001\",\n  \"motherName\": \"Mother\",\n  \"motherPhone\": \"0600000002\",\n  \"guardianName\": \"Guardian\",\n  \"guardianPhone\": \"0600000003\",\n  \"relationOfGuardian\": \"Uncle\",\n  \"systemAccess\": true\n}"
+        }
+      }
+    },
+    {
+      "name": "Students - Update",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-csrf-token",
+            "value": "{{csrfToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students/{{studentId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "{{studentId}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test Student Updated\",\n  \"email\": \"test.student+1@example.com\",\n  \"gender\": \"male\",\n  \"phone\": \"0600000000\",\n  \"dob\": \"2010-01-01\",\n  \"class\": \"Class 1\",\n  \"section\": \"A\",\n  \"roll\": 10,\n  \"admissionDate\": \"2024-09-01\",\n  \"currentAddress\": \"Current address\",\n  \"permanentAddress\": \"Permanent address\",\n  \"fatherName\": \"Father\",\n  \"fatherPhone\": \"0600000001\",\n  \"motherName\": \"Mother\",\n  \"motherPhone\": \"0600000002\",\n  \"guardianName\": \"Guardian\",\n  \"guardianPhone\": \"0600000003\",\n  \"relationOfGuardian\": \"Uncle\",\n  \"systemAccess\": true\n}"
+        }
+      }
+    },
+    {
+      "name": "Students - Set Status (disable/enable)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-csrf-token",
+            "value": "{{csrfToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "{{studentId}}",
+            "status"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": false\n}"
+        }
+      }
+    },
+    {
+      "name": "Students - Delete (soft delete)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "x-csrf-token",
+            "value": "{{csrfToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/students/{{studentId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "{{studentId}}"
+          ]
+        }
+      }
+    }
+  ]
+}

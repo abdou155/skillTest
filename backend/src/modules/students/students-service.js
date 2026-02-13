@@ -3,24 +3,18 @@ const { findAllStudents, findStudentDetail, findStudentToSetStatus, addOrUpdateS
 const { findUserById } = require("../../shared/repository");
 
 const checkStudentId = async (id) => {
-    const isStudentFound = await findUserById(id);
-    if (!isStudentFound) {
+    const user = await findUserById(id);
+    if (!user || user.role_id !== 3) {
         throw new ApiError(404, "Student not found");
     }
 }
 
 const getAllStudents = async (payload) => {
     const students = await findAllStudents(payload);
-    if (students.length <= 0) {
-        throw new ApiError(404, "Students not found");
-    }
-
     return students;
 }
 
 const getStudentDetail = async (id) => {
-    await checkStudentId(id);
-
     const student = await findStudentDetail(id);
     if (!student) {
         throw new ApiError(404, "Student not found");
@@ -45,11 +39,16 @@ const addNewStudent = async (payload) => {
             return { message: ADD_STUDENT_AND_BUT_EMAIL_SEND_FAIL }
         }
     } catch (error) {
+        if (error instanceof ApiError) {
+            throw error;
+        }
         throw new ApiError(500, "Unable to add student");
     }
 }
 
 const updateStudent = async (payload) => {
+    await checkStudentId(payload.userId);
+
     const result = await addOrUpdateStudent(payload);
     if (!result.status) {
         throw new ApiError(500, result.message);

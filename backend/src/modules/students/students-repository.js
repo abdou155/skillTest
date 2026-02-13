@@ -18,7 +18,7 @@ const findAllStudents = async (payload) => {
             t1.is_active AS "systemAccess"
         FROM users t1
         LEFT JOIN user_profiles t3 ON t1.id = t3.user_id
-        WHERE t1.role_id = 3`;
+        WHERE t1.role_id = 3 AND t1.is_active = true`;
     let queryParams = [];
     if (name) {
         query += ` AND t1.name = $${queryParams.length + 1}`;
@@ -44,8 +44,8 @@ const findAllStudents = async (payload) => {
 }
 
 const addOrUpdateStudent = async (payload) => {
-    const query = "SELECT * FROM student_add_update($1)";
-    const queryParams = [payload];
+    const query = "SELECT * FROM public.student_add_update($1::jsonb)";
+    const queryParams = [JSON.stringify(payload)];
     const { rows } = await processDBRequest({ query, queryParams });
     return rows[0];
 }
@@ -77,7 +77,7 @@ const findStudentDetail = async (id) => {
         FROM users u
         LEFT JOIN user_profiles p ON u.id = p.user_id
         LEFT JOIN users r ON u.reporter_id = r.id
-        WHERE u.id = $1`;
+        WHERE u.id = $1 AND u.role_id = 3 AND u.is_active = true`;
     const queryParams = [id];
     const { rows } = await processDBRequest({ query, queryParams });
     return rows[0];
