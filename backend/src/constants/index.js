@@ -4,5 +4,6 @@ const API_HEADERS = {
 };
 
 module.exports = {
-   API_HEADERS,  
+   API_HEADERS,
+   ERROR_MESSAGES,
 };
