@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: school_mgmt
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./seed_db/tables.sql:/docker-entrypoint-initdb.d/01-tables.sql:ro
+      - ./seed_db/seed-db.sql:/docker-entrypoint-initdb.d/02-seed-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d school_mgmt"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      PORT: 5007
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/school_mgmt
+      JWT_ACCESS_TOKEN_SECRET: your_super_secret_access_token_key_here
+      JWT_REFRESH_TOKEN_SECRET: your_super_secret_refresh_token_key_here
+      JWT_ACCESS_TOKEN_TIME_IN_MS: 900000
+      JWT_REFRESH_TOKEN_TIME_IN_MS: 28800000
+      CSRF_TOKEN_SECRET: your_csrf_secret_key_here
+      CSRF_TOKEN_TIME_IN_MS: 950000
+      MAIL_FROM_USER: noreply@yourschool.com
+      RESEND_API_KEY: re_placeholder
+      EMAIL_VERIFICATION_TOKEN_SECRET: your_email_verification_secret_here
+      EMAIL_VERIFICATION_TOKEN_TIME_IN_MS: 18000000
+      PASSWORD_SETUP_TOKEN_SECRET: your_password_setup_secret_here
+      PASSWORD_SETUP_TOKEN_TIME_IN_MS: 300000
+      UI_URL: http://localhost:5173
+      API_URL: http://localhost:5007
+      COOKIE_DOMAIN: localhost
+      NODE_ENV: development
+    ports:
+      - "5007:5007"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      DOCKER: "true"
+      VITE_API_URL: http://localhost:5007
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

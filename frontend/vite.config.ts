@@ -6,6 +6,8 @@ import path from 'path';
 export default ({ mode }: { mode: string }) => {
   process.env = Object.assign(process.env, loadEnv(mode, process.cwd(), ''));
 
+  const shouldOpenBrowser = !(process.env.DOCKER === 'true' || process.env.CI === 'true');
+
   return defineConfig({
     plugins: [react()],
     resolve: {
@@ -14,7 +16,7 @@ export default ({ mode }: { mode: string }) => {
       }
     },
     server: {
-      open: '/app'
+      open: shouldOpenBrowser ? '/app' : false
     }
   });
 };
